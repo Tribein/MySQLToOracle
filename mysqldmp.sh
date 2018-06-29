@@ -4,7 +4,6 @@ MYPWD="mysecret"
 MYDB="mydb"
 DATADIR="./mydata"
 
-
 if [ ! -d $DATADIR ];
 then
 	echo "Directory $DATADIR not found!"

@@ -17,7 +17,13 @@ public class SaxHandler extends DefaultHandler {
     String fieldName;
     String fieldData;
     int fieldPos;
-
+    private String dbUSN,dbPWD,dbSTR;
+    public SaxHandler(String username, String password, String connectionString){
+        dbUSN=username;
+        dbPWD=password;
+        dbSTR=connectionString;
+    }
+    
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
 
@@ -26,7 +32,7 @@ public class SaxHandler extends DefaultHandler {
         switch (qName.toLowerCase()) {
             case "table_data":
                 //System.out.println("Table: "+attributes.getValue("name"));
-                mysqlWorker = new SaxDBWorker(attributes.getValue("name"));
+                mysqlWorker = new SaxDBWorker(attributes.getValue("name"),dbUSN,dbPWD,dbSTR);
                 System.out.println("Processing table: "+mysqlWorker.tableName);
             break;
             case "row":

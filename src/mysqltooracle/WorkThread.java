@@ -27,9 +27,13 @@ public class WorkThread extends Thread {
     String vvv;
     HashMap<String, String> tableColumns = new HashMap();
     ResultSet res;
+    private String dbUSN,dbPWD,dbSTR;
 
-    public WorkThread(Node n) {
+    public WorkThread(Node n, String username, String password, String connectionString) {
         workNode = n;
+        dbUSN = username;
+        dbPWD = password;
+        dbSTR = connectionString;        
     }
 
     @Override
@@ -40,7 +44,7 @@ public class WorkThread extends Thread {
         System.out.println("Starting thread for table " + tableName);
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            con = DriverManager.getConnection("jdbc:oracle:thin:@" + "sefarmdev.gksm.local:1521/sefarm12_dev", "sur2", "sur2");
+            con = DriverManager.getConnection("jdbc:oracle:thin:@" + dbSTR, dbUSN, dbPWD);
             con.setAutoCommit(false);
             alts = con.prepareCall("alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
             alts.execute();

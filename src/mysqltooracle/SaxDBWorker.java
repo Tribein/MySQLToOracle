@@ -24,18 +24,19 @@ public class SaxDBWorker {
     public ArrayList<String> fieldName;
     public ArrayList<String> fieldData;
     public int rowFields;
-    private final String dbusn = "sur2";
-    private final String dbpwd = "sur2";
-    private final String connString = "sefarmtest.gksm.local:1521/sefarm12_test";
+    private String dbUSN, dbPWD, dbSTR;
     private boolean isEmpty = true;
 
-    public SaxDBWorker(String table) {
+    public SaxDBWorker(String table, String username, String password, String connectionString ) {
         tableName = table;
+        dbUSN = username;
+        dbPWD = password;
+        dbSTR = connectionString;
         fieldName = new ArrayList();
         fieldData = new ArrayList();
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            con = DriverManager.getConnection("jdbc:oracle:thin:@" + connString, dbusn, dbpwd);
+            con = DriverManager.getConnection("jdbc:oracle:thin:@" + dbSTR, dbUSN, dbPWD);
             con.setAutoCommit(false);
             alts = con.prepareCall("alter session set nls_date_format='" + nlsDateFormat + "'");
             alts.execute();

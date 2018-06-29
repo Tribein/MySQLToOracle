@@ -22,7 +22,7 @@ public class MysqlToOracle {
     static ArrayList < Thread> threadList = new ArrayList();
     
     public static void main(String[] args) throws Exception {
-        String XMLFILENAME = args[0];
+        String XMLFILENAME = args[3];
         /* DOM
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbFactory.newDocumentBuilder();
@@ -32,7 +32,7 @@ public class MysqlToOracle {
             for (int i = 0; i < nl.getLength(); i++) {
                 if (nl.item(i).getNodeType()== Node.ELEMENT_NODE){
                     if(nl.item(i).getChildNodes().getLength() > 0){
-                        threadList.add( new WorkThread(nl.item(i)) );
+                        threadList.add( new WorkThread(nl.item(i), args[0],args[1],args[2]) );
                         threadList.get(threadList.size()-1).run();
                     }
                 }
@@ -44,7 +44,7 @@ public class MysqlToOracle {
         try {
             InputStream xmlInput = new FileInputStream(XMLFILENAME);
             SAXParser  saxParser = factory.newSAXParser();
-            SaxHandler handler   = new SaxHandler();
+            SaxHandler handler   = new SaxHandler(args[0],args[1],args[2]);
             saxParser.parse(xmlInput, handler);
             /*
             for(MySQLXMLTable table : handler.mysqlTables){
