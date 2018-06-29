@@ -29,15 +29,23 @@ public class SaxDBWorker {
 
     public SaxDBWorker(String table, String username, String password, String connectionString ) {
         tableName = table;
-        dbUSN = username;
-        dbPWD = password;
-        dbSTR = connectionString;
+        dbUSN     = username;
+        dbPWD     = password;
+        dbSTR     = connectionString;
         fieldName = new ArrayList();
         fieldData = new ArrayList();
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection("jdbc:oracle:thin:@" + dbSTR, dbUSN, dbPWD);
             con.setAutoCommit(false);
+            prepareSChema();
+        } catch (Exception e) {
+            System.exit(1);
+        }
+        
+    }
+
+    private void prepareSChema() throws Exception {
             alts = con.prepareCall("alter session set nls_date_format='" + nlsDateFormat + "'");
             alts.execute();
             alts.close();
@@ -68,12 +76,9 @@ public class SaxDBWorker {
                 stmt = con.prepareStatement(insertQuery);
             } catch (Exception e) {
                 System.exit(2);
-            }
-        } catch (Exception e) {
-            System.exit(1);
-        }
+            }        
     }
-
+    
     public void processRow() {
         isEmpty = true;
         for (int k = 1; k <= rowFields; k++) {

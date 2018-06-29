@@ -30,62 +30,28 @@ public class WorkThread extends Thread {
     private String dbUSN,dbPWD,dbSTR;
 
     public WorkThread(Node n, String username, String password, String connectionString) {
-        workNode = n;
-        dbUSN = username;
-        dbPWD = password;
-        dbSTR = connectionString;        
+        workNode    = n;
+        dbUSN       = username;
+        dbPWD       = password;
+        dbSTR       = connectionString;        
+        tableName   = workNode.getAttributes().getNamedItem("name").getNodeValue();
     }
 
     @Override
-    public void run() {
-        tableName = workNode.getAttributes().getNamedItem("name").getNodeValue();
-        
-        
+    public void run() { 
         System.out.println("Starting thread for table " + tableName);
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection("jdbc:oracle:thin:@" + dbSTR, dbUSN, dbPWD);
             con.setAutoCommit(false);
-            alts = con.prepareCall("alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
-            alts.execute();
-            alts.close();
-            tcols = con.prepareStatement("select upper(column_name),data_type from user_tab_columns where upper(table_name)=upper('" + tableName + "')");
-            res = tcols.executeQuery();
-            System.out.println("Truncating tabe: "+tableName);
-            trct = con.prepareCall("truncate table "+tableName+" reuse storage");
-            trct.execute();
-            trct.close();
-            System.out.println("Table truncated");
-            //System.out.println("Table columns:");
-            while (res != null && res.next()) {
-                tableColumns.put(res.getString(1), res.getString(2));
-                //System.out.println(res.getString(1)+":"+res.getString(2));
-            }
-            if(tableColumns.size()==0){
-                System.out.println("Table doesn't exists: "+tableName);
-                System.exit(5);
-            }
+            prepareSchema();
         } catch (Exception e) {
             System.exit(1);
-        }
-        ArrayList<String> iq = new ArrayList();
-        rowsNode = workNode.getChildNodes();
-
-        rowFields = tableColumns.size();
-        for (int i = 0; i < rowFields; i++) {
-            iq.add("?");
-        }
-
-        insertQuery = "insert into " + tableName + " values(" + String.join(" , ", iq) + ")";
-        //System.out.println(insertQuery);
-        try {
-            stmt = con.prepareStatement(insertQuery);
-        } catch (Exception e) {
-            System.exit(2);
         }
 
         int bp;
         String fieldName;
+        rowsNode = workNode.getChildNodes();
         System.out.println("Processing "+ rowsNode.getLength()+" nodes");
         for (int i = 0; i < rowsNode.getLength(); i++) {
             if (rowsNode.item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -155,5 +121,41 @@ public class WorkThread extends Thread {
 
         }
         System.out.println("Finishing thread for table " + tableName);
+    }
+    
+    private void prepareSchema() throws Exception {
+            alts = con.prepareCall("alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'");
+            alts.execute();
+            alts.close();
+            tcols = con.prepareStatement("select upper(column_name),data_type from user_tab_columns where upper(table_name)=upper('" + tableName + "')");
+            res = tcols.executeQuery();
+            System.out.println("Truncating tabe: "+tableName);
+            trct = con.prepareCall("truncate table "+tableName+" reuse storage");
+            trct.execute();
+            trct.close();
+            System.out.println("Table truncated");
+            //System.out.println("Table columns:");
+            while (res != null && res.next()) {
+                tableColumns.put(res.getString(1), res.getString(2));
+                //System.out.println(res.getString(1)+":"+res.getString(2));
+            }
+            if(tableColumns.size()==0){
+                System.out.println("Table doesn't exists: "+tableName);
+                System.exit(5);
+            }   
+        ArrayList<String> iq = new ArrayList();
+        
+        rowFields = tableColumns.size();
+        for (int i = 0; i < rowFields; i++) {
+            iq.add("?");
+        }
+        
+        insertQuery = "insert into " + tableName + " values(" + String.join(" , ", iq) + ")";
+        //System.out.println(insertQuery);
+        try {
+            stmt = con.prepareStatement(insertQuery);
+        } catch (Exception e) {
+            System.exit(2);
+        }            
     }
 }
