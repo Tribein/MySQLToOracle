@@ -70,8 +70,10 @@ public class SaxDBWorker {
             for (int i = 0; i < rowFields; i++) {
                 iq.add("?");
             }
+            
             insertQuery = "insert into " + tableName + " values(" + String.join(" , ", iq) + ")";
             //System.out.println(insertQuery);
+            
             try {
                 stmt = con.prepareStatement(insertQuery);
             } catch (Exception e) {

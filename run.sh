@@ -3,8 +3,9 @@ DATADIR="./mydata"
 LOGDIR="./mylog"
 ORAUSER="scott"
 ORAPWD="tiger"
-ORASTR="example.net:1521/example_db"
-JPRM=""
+ORASTR="ecample.net:1521/service"
+JARPATH="./dist"
+JAVAOPTS="-cp $JARPATH/lib"
 
 if [ ! -d $DATADIR ];
 then
@@ -18,6 +19,6 @@ fi
 
 for i in $(ls ./$DATADIR/);
 do
-		java $JPRM -XX:+UseG1GC -jar MysqlToOracle.jar "$ORAUSER" "$ORAPWD" "$ORASTR" $DATADIR/$i &> $LOGDIR/$i.log &
+		java $JAVAOPTS -XX:+UseG1GC -jar $JARPATH/MysqlToOracle.jar "$ORAUSER" "$ORAPWD" "$ORASTR" $DATADIR/$i &> $LOGDIR/$i.log &
 done;
 

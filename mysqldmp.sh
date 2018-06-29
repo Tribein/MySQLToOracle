@@ -1,3 +1,4 @@
+#!/bin/bash
 MYHOST="localhost"
 MYUSER="myuser"
 MYPWD="mysecret"

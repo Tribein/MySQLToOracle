@@ -85,14 +85,11 @@ public class SaxHandler extends DefaultHandler {
             throws SAXException {
 
         String value = new String(ch, start, length).trim();
-        /*if (value.length() == 0) {
-            return; // ignore white space
+        if (value.length() == 0) {
+            return;
         }
-        */
         if (currentElement().equalsIgnoreCase("field") && fieldName != null && ! fieldName.isEmpty()) {
             fieldData += value;
-            //System.out.println(fieldName+" : "+value);
-            
         }
     }
 
